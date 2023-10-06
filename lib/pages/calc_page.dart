@@ -1,6 +1,7 @@
 import 'package:calculadora_imc/model/user.dart';
 import 'package:calculadora_imc/repository/user_repository.dart';
 import 'package:calculadora_imc/utils/utils.dart';
+import 'package:calculadora_imc/widgets/list_imc_page.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/card_page.dart';
@@ -101,6 +102,11 @@ class _CalcPageState extends State<CalcPage> {
                   );
 
                   userRepository.salvar(user);
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ListImcPage(),
+                      ));
                   weightController.clear();
                 }
               },
