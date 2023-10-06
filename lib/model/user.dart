@@ -1,30 +1,29 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
-class User {
-  final String _id = UniqueKey().toString();
-  double _weigth = 0.0;
-  double _height = 0.0;
+part 'user.g.dart';
 
-  User(
-    this._weigth,
-    this._height,
-  );
+@HiveType(typeId: 0)
+class User extends HiveObject {
+  @HiveField(0)
+  String id = UniqueKey().toString();
+  @HiveField(1)
+  double weigth = 0.0;
+  @HiveField(2)
+  double height = 0.0;
+  @HiveField(3)
+  double imc = 0.0;
 
-  String get id => _id;
+  User();
 
-  double get weigth => _weigth;
-  set weight(double weight) {
-    _weigth = weight;
+  User.vazio() {
+    weigth = 0.0;
+    height = 0.0;
   }
 
-  double get height => _height;
-  set height(double height) {
-    _height = height;
-  }
-
-  double calculaImc(double weight, double height) {
-    return weight / pow(height, 2);
+  void calculaImc(double weigth, double height) {
+    imc = weigth / pow(height, 2);
   }
 }

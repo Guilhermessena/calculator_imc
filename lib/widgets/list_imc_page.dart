@@ -1,32 +1,50 @@
 import 'package:calculadora_imc/model/user.dart';
+import 'package:calculadora_imc/repository/user_repository.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/utils.dart';
 
 class ListImcPage extends StatefulWidget {
-  final List<User> lsImc;
-  const ListImcPage({super.key, required this.lsImc,});
+  const ListImcPage({
+    super.key,
+  });
 
   @override
   State<ListImcPage> createState() => _ListImcPageState();
 }
 
 class _ListImcPageState extends State<ListImcPage> {
-  double imc = 0.0;
+  late UserRepository userRepository;
+
+  var _users = <User>[];
+
+  @override
+  void initState() {
+    obterImcs();
+    super.initState();
+  }
+
+  void obterImcs() async {
+    userRepository = await UserRepository.load();
+    _users = userRepository.obterDados();
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: widget.lsImc.length,
-      itemBuilder: (context, index) {
-        var imcUser = widget.lsImc[index];
-        imc = imcUser.calculaImc(imcUser.weigth, imcUser.height);
-        return ListTile(
-          title: Text(imcUser.id),
-          trailing: Text(
-              "${imcUser.calculaImc(imcUser.weigth, imcUser.height).toStringAsFixed(2)} - ${Utils.statusImc(imc)}"),
-        );
-      },
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+      child: ListView.builder(
+        itemCount: _users.length,
+        itemBuilder: (context, index) {
+          var imcUser = _users[index];
+          return ListTile(
+            title: Text(imcUser.id),
+            trailing: Text(
+                "${imcUser.imc.toStringAsFixed(2)} - ${Utils.statusImc(imcUser.imc)}"),
+          );
+        },
+      ),
     );
   }
 }

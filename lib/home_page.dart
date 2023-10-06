@@ -1,4 +1,5 @@
 import 'package:calculadora_imc/pages/calc_page.dart';
+import 'package:calculadora_imc/widgets/list_imc_page.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -9,8 +10,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  var weightController = TextEditingController();
-  var heightController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -19,7 +18,7 @@ class _HomePageState extends State<HomePage> {
       child: Form(
         key: _formKey,
         child: Scaffold(
-          body: CalcPage(formKey: _formKey),
+          body: PageView(children: [CalcPage(formKey: _formKey), const ListImcPage()]),
         ),
       ),
     );

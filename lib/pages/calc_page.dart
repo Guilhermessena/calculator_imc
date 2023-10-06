@@ -1,7 +1,6 @@
 import 'package:calculadora_imc/model/user.dart';
 import 'package:calculadora_imc/repository/user_repository.dart';
 import 'package:calculadora_imc/utils/utils.dart';
-import 'package:calculadora_imc/widgets/list_imc_page.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/card_page.dart';
@@ -21,18 +20,26 @@ class CalcPage extends StatefulWidget {
 class _CalcPageState extends State<CalcPage> {
   var weightController = TextEditingController();
   var heightController = TextEditingController();
-  var imc = 0.0;
-  var userRepository = UserRepository();
-  var lsImc = <User>[];
+  var lsUser = <User>[];
+
+  late UserRepository userRepository;
+
+  var user = User.vazio();
 
   @override
   void initState() {
-    returnListImc();
+    carregarDados();
     super.initState();
   }
 
-  void returnListImc() async {
-    lsImc = await userRepository.listar();
+  void carregarDados() async {
+    userRepository = await UserRepository.load();
+    lsUser = userRepository.obterDados();
+    heightController.text = lsUser == [] || lsUser.isEmpty
+        ? ''
+        : lsUser.last.height == 0.0
+            ? ''
+            : lsUser.last.height.toString();
     setState(() {});
   }
 
@@ -42,6 +49,7 @@ class _CalcPageState extends State<CalcPage> {
       margin: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
       child: Column(
         children: [
+          Expanded(child: Container()),
           const CardPage(texto: "Calcula IMC"),
           const SizedBox(
             height: 20,
@@ -80,17 +88,20 @@ class _CalcPageState extends State<CalcPage> {
             child: TextButton(
               onPressed: () async {
                 if (widget.formKey!.currentState!.validate()) {
-                  var user = User(double.parse(weightController.text),
-                      double.parse(heightController.text));
-                  imc = user.calculaImc(user.weigth, user.height);
+                  FocusManager.instance.primaryFocus?.unfocus();
+
+                  user.height = double.parse(heightController.text);
+                  user.weigth = double.parse(weightController.text);
+                  user.calculaImc(user.weigth, user.height);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                          'IMC ${imc.toStringAsFixed(2)} - ${Utils.statusImc(imc)}'),
+                          'IMC ${user.imc.toStringAsFixed(2)} - ${Utils.statusImc(user.imc)}'),
                     ),
                   );
-                  await userRepository.adicionar(user);
-                  setState(() {});
+
+                  userRepository.salvar(user);
+                  weightController.clear();
                 }
               },
               child: const Text(
@@ -100,10 +111,6 @@ class _CalcPageState extends State<CalcPage> {
             ),
           ),
           Expanded(child: Container()),
-          Expanded(
-            flex: 3,
-            child: ListImcPage(lsImc: lsImc),
-          ),
         ],
       ),
     );
